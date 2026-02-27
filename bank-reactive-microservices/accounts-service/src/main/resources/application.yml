@@ -1,0 +1,47 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: accounts-service
+
+  r2dbc:
+    url: r2dbc:mysql://localhost:3306/bank_accounts
+    username: root
+    password: root
+
+  flyway:
+    enabled: true
+    url: jdbc:mysql://localhost:3306/bank_accounts?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    user: root
+    password: root
+    locations: classpath:db/migration
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      acks: all
+      retries: 3
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        # JSON sin headers de tipo (más compatible entre servicios)
+        spring.json.add.type.headers: false
+
+app:
+  kafka:
+    topics:
+      accounts-events: accounts.events
+
+logging:
+  level:
+    root: INFO
+    com.bank.accounts: DEBUG
+    org.springframework.kafka: DEBUG
+    org.springframework.web.reactive: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
